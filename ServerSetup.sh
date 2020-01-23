@@ -234,9 +234,15 @@ install_postfix_dovecot() {
 	inet_protocols = ipv4
 	milter_default_action = accept
 	milter_protocol = 6
-	smtpd_milters = inet:12301,inet:localhost:54321
-	non_smtpd_milters = inet:12301,inet:localhost:54321
+	milter_mail_macros="i {mail_addr} {client_addr} {client_name} {auth_type} {auth_authen}"
+	smtpd_milters = inet:12301,inet:localhost:12301
+	non_smtpd_milters = inet:12301,inet:localhost:12301
+	header_checks = pcre:/etc/postfix/header_checks
 	EOF
+        
+	cat <<-EOF > /etc/postfix/header_checks
+              /^Received:\s+from\s+gophish.*/ IGNORE
+              EOF
 
 	cat <<-EOF >> /etc/postfix/master.cf
 	submission inet n       -       -       -       -       smtpd
@@ -291,7 +297,7 @@ install_postfix_dovecot() {
 
 	cat <<-EOF > /etc/opendmarc.conf
 	AuthservID ${primary_domain}
-	PidFile /var/run/opendmarc.pid
+	PidFile /var/run/opendmarc/opendmarc.pid
 	RejectFailures false
 	Syslog true
 	TrustedAuthservIDs ${primary_domain}
@@ -302,6 +308,7 @@ install_postfix_dovecot() {
 	HistoryFile /var/run/opendmarc/opendmarc.dat
 	EOF
 
+        chown -R opendmarc:opendmarc /var/run/opendmarc/
 	mkdir "/etc/opendmarc/"
 	echo "localhost" > /etc/opendmarc/ignore.hosts
 	chown -R opendmarc:opendmarc /etc/opendmarc
