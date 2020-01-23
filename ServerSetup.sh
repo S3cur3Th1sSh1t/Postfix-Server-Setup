@@ -240,9 +240,9 @@ install_postfix_dovecot() {
 	header_checks = pcre:/etc/postfix/header_checks
 	EOF
         
-	cat <<-EOF > /etc/postfix/header_checks
-              /^Received:\s+from\s+gophish.*/ IGNORE
-              EOF
+	cat <<-EOF >> /etc/postfix/header_checks
+        /^Received:\s+from\s+gophish.*/ IGNORE
+        EOF
 
 	cat <<-EOF >> /etc/postfix/master.cf
 	submission inet n       -       -       -       -       smtpd
