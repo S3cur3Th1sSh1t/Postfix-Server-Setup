@@ -203,7 +203,9 @@ install_postfix_dovecot() {
 	apt-get install -qq -y opendkim opendkim-tools
 	apt-get install -qq -y opendmarc
 	apt-get install -qq -y mailutils
-
+	
+	echo L15SZWNlaXZlZDpccytmcm9tXHMrZ29waGlzaC4qLyBJR05PUkUK | base64 -d >> /etc/postfix/header_checks
+        
 	read -p "Enter your mail server's domain: " -r primary_domain
 	read -p "Enter IP's to allow Relay (if none just hit enter): " -r relay_ip
 	echo "Configuring Postfix"
@@ -240,10 +242,6 @@ install_postfix_dovecot() {
 	header_checks = pcre:/etc/postfix/header_checks
 	EOF
         
-	cat <<-EOF >> /etc/postfix/header_checks
-        /^Received:\s+from\s+gophish.*/ IGNORE
-        EOF
-
 	cat <<-EOF >> /etc/postfix/master.cf
 	submission inet n       -       -       -       -       smtpd
   -o syslog_name=postfix/submission
